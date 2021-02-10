@@ -281,13 +281,14 @@ $(document).on('change', ".{$this->getClass($column)}", function () {
     var target = $(this).closest('form').find(".{$this->getClass($target)}");
     $.get("$resourceUrl",{q : this.value}, function (data) {
         target.find("option").remove();
-        $.each(data, function (i, item) {
-            $(target).append($('<option>', {
-                value: item.$idField,
-                text : item.$textField
-            }));
+	//以下部分改动
+        $(target).select2({
+            data: $.map(data, function (d) {
+                d.id = d.$idField;
+                d.text = d.$textField;
+                return d;
+            })
         });
-        
         $(target).val(null).trigger('change');
     }, 'json');
 });
