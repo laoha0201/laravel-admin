@@ -36,6 +36,13 @@ trait UploadField
      *
      * @var bool
      */
+    protected $useMd5Name = false;
+    
+	/**
+     * If use unique name to store upload file.
+     *
+     * @var bool
+     */
     protected $useUniqueName = false;
 
     /**
@@ -311,7 +318,17 @@ trait UploadField
 
         return $this;
     }
-
+    /**
+     * Use md5 name for store upload file.
+     *
+     * @return $this
+     */
+    public function md5Name()
+    {
+        $this->useMd5Name = true;
+		$this->retainable = true;
+        return $this;
+    }
     /**
      * Use unique name for store upload file.
      *
@@ -345,7 +362,11 @@ trait UploadField
      */
     protected function getStoreName(UploadedFile $file)
     {
-        if ($this->useUniqueName) {
+        if ($this->useMd5Name) {
+            return $this->generateMd5Name($file);
+        }
+		
+		if ($this->useUniqueName) {
             return $this->generateUniqueName($file);
         }
 
@@ -449,6 +470,19 @@ trait UploadField
     }
 
     /**
+     * Generate a md5 name for uploaded file.
+     *
+     * @param UploadedFile $file
+     *
+     * @return string
+     */
+    protected function generateMd5Name(UploadedFile $file)
+    {
+        return md5_file($file->getRealPath()).'.'.$file->getClientOriginalExtension();
+    }
+
+
+	/**
      * Generate a unique name for uploaded file.
      *
      * @param UploadedFile $file
